@@ -106,7 +106,58 @@ def search_listings(
         python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
     """
     # TODO: replace this with your implementation
-    return []
+    
+    listings = load_listings()
+    query_words = _keywords(description)
+
+    matches = []
+
+    for listing in listings:
+
+        # Filter by maximum price
+        if max_price is not None:
+            if listing["price"] > max_price:
+                continue
+
+        # Filter by size
+        if size is not None:
+            listing_sizes = (
+                listing["size"]
+                .lower()
+                .replace("/", " ")
+                .split()
+            )
+
+            if size.lower() not in listing_sizes:
+                continue
+
+        # Search description-related fields
+        searchable_text = " ".join([
+            listing["title"],
+            listing["description"],
+            listing["category"],
+            " ".join(listing["style_tags"]),
+            " ".join(listing["colors"]),
+            listing["brand"] or "",
+        ]).lower()
+
+        listing_words = _keywords(searchable_text)
+
+        # Keyword overlap
+        score = len(query_words & listing_words)
+
+        if score == 0:
+            continue
+
+        matches.append((score, listing))
+
+    # Best matches first
+    matches.sort(key=lambda x: x[0], reverse=True)
+
+    return [
+        listing
+        for score, listing in matches[:config.SEARCH_RESULT_LIMIT]
+    ]
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────
@@ -140,7 +191,44 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
         python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
     """
     # TODO: replace this with your implementation
-    return ""
+    wardrobe_items = wardrobe.get("items", [])
+
+    # Empty wardrobe -> give general styling advice
+    if not wardrobe_items:
+        prompt = f"""
+        Give 1 or 2 general outfit ideas for this thrifted item:
+
+        Item: {new_item["title"]}
+        Description: {new_item["description"]}
+        Category: {new_item["category"]}
+        Colors: {", ".join(new_item["colors"])}
+        Style tags: {", ".join(new_item["style_tags"])}
+
+        The user does not have any wardrobe items available.
+        Give general styling suggestions for this item.
+        """
+
+        return generate(prompt)
+
+    # Wardrobe has items -> use what the user already owns
+    wardrobe_text = "\n".join(
+        str(item) for item in wardrobe_items
+    )
+
+    prompt = f"""
+    Suggest 1 or 2 outfits using this new thrifted item:
+
+    New item:
+    {new_item["title"]} - {new_item["description"]}
+
+    Items the user already owns:
+    {wardrobe_text}
+
+    Use specific pieces from the user's wardrobe and name those pieces
+    in the outfit suggestions.
+    """
+
+    return generate(prompt)    
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
@@ -180,4 +268,32 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
     """
     # TODO: replace this with your implementation
-    return ""
+    # 1. Handle empty outfit
+    if not outfit or not outfit.strip():
+        return "Cannot create a fit card because no outfit suggestion was provided."
+
+    # 2. Build the prompt
+    prompt = f"""
+    Create a short social media caption for this thrift find.
+
+    Item: {new_item["title"]}
+    Description: {new_item["description"]}
+    Price: ${new_item["price"]:.2f}
+    Platform: {new_item["platform"]}
+    Colors: {", ".join(new_item["colors"])}
+    Style: {", ".join(new_item["style_tags"])}
+
+    Outfit:
+    {outfit}
+
+    Requirements:
+    - Write 2 to 4 sentences.
+    - Make it sound like a real social media post, not a product description.
+    - Mention the item once.
+    - Mention the price once.
+    - Mention the platform once.
+    - Describe the vibe of the outfit.
+    """
+
+    # 3. Generate and return the fit card
+    return generate(prompt)
