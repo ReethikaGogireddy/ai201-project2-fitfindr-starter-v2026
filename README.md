@@ -41,6 +41,8 @@
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
+     The user asks for the kind of dress or clothes they want and they either provide the size or their budget for it. The agent gives them back a teh clothes that would work with it and also writes a caption for that. 
+
 
 
 ---
@@ -59,24 +61,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** It searches through the listings that matches the description and optially applies price t and size filters.
+- **Inputs:** size(string), description(string), max_price(float)
+- **Returns:** It returns a list which matches the descriptions.
+- **When it has nothing:**  If nothing matches the descriptions then it returns an empty list.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** When a item is given along with the wardrobe, this function suggests one or two outfits.
+- **Inputs:** new_item(list), wardrobe(listing dict)
+- **Returns:** A string with outfit suggestions.
+- **When it has nothing:** It returns general outfit sugestions rather than empty string.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** This fucntion generates a short caption someone would actually post about the find.
+- **Inputs:** outfit(string), new_item(listing dict)
+- **Returns:** This function returns two-to-four sentence caption.
+- **When it has nothing:** When the outfit is empty the it return an decriptive message rather than raising error.
 
 ---
 
@@ -93,13 +95,13 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** If search_listings returns an empty list, put a message in the session and stop. Otherwise, take the first result and go to suggest_outfit.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which --> The query is parsed using string splitting to extract the search description and optional filters such as size and maximum price.
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** <!-- which fields, in what order --> The session stores the user's query first, followed by the search results. If a result is found, the first listing is stored and passed to suggest_outfit. If no results are found, a message is stored in the session instead.
 
 ---
 

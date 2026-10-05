@@ -27,6 +27,33 @@ from utils.data_loader import load_listings
 
 # ── Tool 1: search_listings ───────────────────────────────────────────────────
 
+
+
+STOP_WORDS ={
+    "a", "an", "and", "are", "as", "at", "be", "by", "for", "from","over", "the", "to", "with", "in", "on", "of", "is", "it", "this", "that"
+}
+
+def _keywords(text:str)-> set[str]:
+    """
+    Return a set of keywords from the input text, lowercased and stripped of
+    punctuation and stop words.
+    """
+    import re
+
+    # Lowercase the text
+    text = text.lower()
+
+    # Remove punctuation using regex
+    text = re.sub(r'[^\w\s]', '', text)
+
+    # Split into words and filter out stop words
+    keywords = {word for word in text.split() if word not in STOP_WORDS}
+
+    return keywords
+
+
+# def _size_tokens(size: str) -> set[str]:
+#     cleaned re.sub
 def search_listings(
     description: str,
     size: str | None = None,
