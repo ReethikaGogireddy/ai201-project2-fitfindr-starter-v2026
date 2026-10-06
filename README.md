@@ -99,7 +99,7 @@
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which --> The query is parsed using string splitting to extract the search description and optional filters such as size and maximum price.
+**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which --> The query is parsed regular expressions to extract the search description and optional filters such as size and maximum price.
 
 **What moves through the session:** <!-- which fields, in what order --> The session stores the user's query first, followed by the search results. If a result is found, the first listing is stored and passed to suggest_outfit. If no results are found, a message is stored in the session instead.
 

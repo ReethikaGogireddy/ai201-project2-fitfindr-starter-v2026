@@ -105,10 +105,100 @@ def run_agent(query: str, wardrobe: dict) -> dict:
       • A handler for ModelUnavailable, so a bad key produces a message rather
         than a stack trace. The import is already at the top of this file.
     """
+    import re 
     session = new_session(query, wardrobe)
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+        # 2. Parse the query
+    price_match = re.search(
+        r"under\s*\$?(\d+(?:\.\d+)?)",
+        session["query"],
+        re.IGNORECASE,
+    )
+
+    if price_match:
+        max_price = float(price_match.group(1))
+    else:
+        max_price = None
+
+    size_match = re.search(
+        r"\bsize\s+([A-Za-z0-9/]+)",
+        session["query"],
+        re.IGNORECASE,
+    )
+
+    if size_match:
+        size = size_match.group(1)
+    else:
+        size = None
+
+    # Remove price and size from the query to get the description
+    description = re.sub(
+        r"under\s*\$?\d+(?:\.\d+)?",
+        "",
+        session["query"],
+        flags=re.IGNORECASE,
+    )
+
+    description = re.sub(
+        r"\bsize\s+[A-Za-z0-9/]+",
+        "",
+        description,
+        flags=re.IGNORECASE,
+    )
+
+    description = re.sub(
+        r"\b(looking for|find me|i want|i need)\b",
+        "",
+        description,
+        flags=re.IGNORECASE,
+    ).strip()
+
+    # Store parsed values in session
+    session["parsed"] = {
+        "description": description,
+        "size": size,
+        "max_price": max_price,
+    }
+
+    # 3. First iteration: search listings
+    count = 1
+    trace.check_iterations(count)
+
+    session["search_results"] = search_listings(
+        session["parsed"]["description"],
+        session["parsed"]["size"],
+        session["parsed"]["max_price"],
+    )
+
+    # 4. BRANCH: stop if search returned nothing
+    if not session["search_results"]:
+        session["error"] = (
+            "No matching items were found. Try changing the description, "
+            "size, or maximum price."
+        )
+        return session
+
+    # 5. Select the first result
+    session["selected_item"] = session["search_results"][0]
+
+    # 6. Second iteration: suggest outfit
+    count += 1
+    trace.check_iterations(count)
+
+    session["outfit_suggestion"] = suggest_outfit(
+        session["selected_item"],
+        session["wardrobe"],
+    )
+
+    # 7. Third iteration: create fit card
+    count += 1
+    trace.check_iterations(count)
+
+    session["fit_card"] = create_fit_card(
+        session["outfit_suggestion"],
+        session["selected_item"],
+    )
+
     return session
 
 
@@ -130,16 +220,22 @@ if __name__ == "__main__":
     from utils.data_loader import get_example_wardrobe
 
     print("=== A query the data can match ===")
-    _show(run_agent(
-        query="looking for a vintage graphic tee under $30",
-        wardrobe=get_example_wardrobe(),
-    ))
+    session = run_agent(
+    query="looking for a vintage graphic tee under $30",
+    wardrobe=get_example_wardrobe(),
+    )
+
+    _show(session)
+    print(session)
 
     print("\n=== A query it can't ===")
-    _show(run_agent(
-        query="designer ballgown size XXS under $5",
-        wardrobe=get_example_wardrobe(),
-    ))
+    session = run_agent(
+    query="designer ballgown size XXS under $5",
+    wardrobe=get_example_wardrobe(),
+    )
+
+    _show(session)
+    print(session)
 
     print(
         "\nThe second one should stop before the fit card. If both paths look "
