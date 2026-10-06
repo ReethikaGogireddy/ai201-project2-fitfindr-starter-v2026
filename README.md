@@ -177,15 +177,15 @@ Nothing beats the effortless cool of a classic outfit featuring crisp white snea
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Claude to review and correct my search_listings implementation based on the provided requirements.
+- *What came back:* It suggested filtering listings by price and size first, then calculating keyword overlap between the user's description and the listing information.
+- *What I changed:* I updated my search logic to filter by max_price and size, rank listings using keyword overlap, and return an empty list when there are no matches.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked ChatGPT how to implement the planning loop while making the session state visible between tools.
+- *What came back:* It suggested storing the result of each tool in the session and having the next tool read its input back from the session. It also showed where to branch when search_listings returns an empty list.
+- *What I changed:*  I implemented the branch so the agent stores an error message and stops when there are no search results. When results exist, I store the first result in session["selected_item"] and pass the session values through suggest_outfit and create_fit_card.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
