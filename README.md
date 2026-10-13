@@ -269,13 +269,28 @@ that produced it:
 **Happy path**
 
 ```
+python app.py ask 'satin slip dress under $50' --trace
+[1] search_listings
+      in:  dict with keys: description, size, max_price
+      out: 1 items: 90s Silk Slip Dress — Floral, Midi Length
+[2] suggest_outfit
+      in:  dict with keys: item, wardrobe
+      out: Here are two ways to style your new 90s floral silk slip dress using pieces already in your wardrobe:  ### Out…
+[3] create_fit_card
+      in:  dict with keys: outfit, item
+      out: Channel your inner 90s icon with this dreamy floral silk slip dress, perfect for throwing on with combat boots…
 
 ```
 
 **Empty search**
 
 ```
+python app.py ask '...' --trace
+[1] search_listings
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
 
+  No matching items were found. Try changing the description, size, or maximum price.
 ```
 
 **On the MCP move:** <!-- what changed in your code, and whether anything

@@ -173,6 +173,12 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         "max_price": session["parsed"]["max_price"],
     },
 )
+    
+    trace.step(
+    "search_listings",
+    inputs=session["parsed"],
+    returned=session["search_results"],
+    )
 
     # 4. BRANCH: stop if search returned nothing
     if not session["search_results"]:
@@ -194,6 +200,15 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         session["wardrobe"],
     )
 
+    trace.step(
+    "suggest_outfit",
+    inputs={
+        "item": session["selected_item"],
+        "wardrobe": session["wardrobe"],
+    },
+    returned=session["outfit_suggestion"],
+)
+
     # 7. Third iteration: create fit card
     count += 1
     trace.check_iterations(count)
@@ -202,6 +217,15 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         session["outfit_suggestion"],
         session["selected_item"],
     )
+
+    trace.step(
+    "create_fit_card",
+    inputs={
+        "outfit": session["outfit_suggestion"],
+        "item": session["selected_item"],
+    },
+    returned=session["fit_card"],
+)
 
     return session
 
