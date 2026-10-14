@@ -195,10 +195,17 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     count += 1
     trace.check_iterations(count)
 
-    session["outfit_suggestion"] = suggest_outfit(
-        session["selected_item"],
-        session["wardrobe"],
+    try:
+        session["outfit_suggestion"] = suggest_outfit(
+            session["selected_item"],
+            session["wardrobe"],
     )
+    except ModelUnavailable:
+        session["error"] = (
+            "Outfit suggestion failed because the model is unavailable. "
+            "Check your API key or try again later."
+        )
+        return session
 
     trace.step(
     "suggest_outfit",
@@ -213,10 +220,17 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     count += 1
     trace.check_iterations(count)
 
-    session["fit_card"] = create_fit_card(
-        session["outfit_suggestion"],
-        session["selected_item"],
-    )
+    try:
+        session["fit_card"] = create_fit_card(
+            session["outfit_suggestion"],
+            session["selected_item"],
+        )
+    except ModelUnavailable:
+        session["error"] = (
+            "Fit card creation failed because the model is unavailable. "
+            "Check your API key or try again later."
+        )
+        return session
 
     trace.step(
     "create_fit_card",
