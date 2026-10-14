@@ -464,11 +464,11 @@ Trace:
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Full three-tool run returns a fit card |  4 of 5  | MET | Manually verified to see if every run runs all three tools |
+| 2 | Empty search stops before tool 2 | 5 of 5 | MET | Manually checked if the search stops before too2 if the search is empty |
+| 3 | Item in session matches item passed on | 5 of 5 | MET | Manually verified if the same item is being passed on from one tool to another  |
+| 4 | Fit card mentions the item's name and price | 4 of 5  | MET | Manually verified if the fit card as the item's name and price in it. |
+| 5 | Over-budget query returns nothing over the limit | 5 of 5  | MET | Manually verified if the returned outfit or dress is with the budget limit  |
 
 **Diagnoses**
 
