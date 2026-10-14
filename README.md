@@ -187,6 +187,12 @@ Nothing beats the effortless cool of a classic outfit featuring crisp white snea
 - *What came back:* It suggested storing the result of each tool in the session and having the next tool read its input back from the session. It also showed where to branch when search_listings returns an empty list.
 - *What I changed:*  I implemented the branch so the agent stores an error message and stops when there are no search results. When results exist, I store the first result in session["selected_item"] and pass the session values through suggest_outfit and create_fit_card.
 
+**Moment 3**
+
+- *What I asked for:* I asked Claude to on the use cases of the MCP and the actual flow of that.
+- *What came back:* It gave me the use case of MCP and how it actually interacts which the application or project.
+- *What I changed:* Based on the above files I was able to find out what files do I need to interact with.
+
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
      Don't fill these in during unit 3.
@@ -515,10 +521,10 @@ python app.py ask '...' --trace
   No matching items were found. Try changing the description, size, or maximum price.
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
+**On the MCP move:** <!-- what changed in your code, and whether anything behaved differently afterwards. If the rewire didn't work, say exactly where it broke — the error text and the last thing that worked. That earns the point in full. -->
+
+I believe now it is acting like an true AI agent where it decides which tool to call based on the requirements.
+
 
 
 
@@ -562,6 +568,7 @@ It did not help, because all of my conditions are met in the intial log itself.
      you did. "I ran out of time" is fine if it's true. Pretending nothing is
      left is not. -->
 
+I ran out of time and I still think that it's needs to be evaluated against more questions in order to find where it breaks.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════
